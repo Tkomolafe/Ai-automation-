@@ -1,0 +1,419 @@
+{
+  "name": "Cold Email Generator and Sender",
+  "nodes": [
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        1008,
+        176
+      ],
+      "id": "550145ff-bc50-4de0-bc24-945f1174bfc0",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "TULjb22tiJq7GqfU",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "14MVYe7QNBY5KM3cZlUvxm3_BExD46ZnccY-C094_zsM",
+          "mode": "list",
+          "cachedResultName": "Brand Co",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14MVYe7QNBY5KM3cZlUvxm3_BExD46ZnccY-C094_zsM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Form responses",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14MVYe7QNBY5KM3cZlUvxm3_BExD46ZnccY-C094_zsM/edit#gid=0"
+        },
+        "event": "rowAdded",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        -256,
+        -16
+      ],
+      "id": "59f0ddd1-7380-42c7-ba19-0f14e7564e46",
+      "name": "Get Brand info",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "aWOihzp9Nse4vDWy",
+          "name": "Google Sheets Trigger account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5dc14877-c934-4497-9c88-0ede277601d6",
+              "name": "Name",
+              "value": "={{ $json['NAME OF THE BRAND'] }}",
+              "type": "string"
+            },
+            {
+              "id": "fdfea5c6-a0b2-428c-8fa5-c883bb82835b",
+              "name": "Email",
+              "value": "={{ $json.EMAIL }}",
+              "type": "string"
+            },
+            {
+              "id": "32b6bf35-4071-4027-b651-91d88082bd92",
+              "name": "Product/Service",
+              "value": "={{ $json['PRODUCTS/SERVICE'] }}",
+              "type": "string"
+            },
+            {
+              "id": "5a89f1fe-07a7-4130-ac80-a1e28e0f8c93",
+              "name": "ProductUsed",
+              "value": "={{ $json['USED?'] }}",
+              "type": "string"
+            },
+            {
+              "id": "c9423ac2-6376-43b6-a849-52da75627200",
+              "name": "Product Strength",
+              "value": "={{ $json['WHAT YOU LIKED?'] }}",
+              "type": "string"
+            },
+            {
+              "id": "1bb49f54-c56c-42b4-a2e4-56c3b190de89",
+              "name": "Audience Reception",
+              "value": "={{ $json['AUDIENCE RECEPTION'] }}",
+              "type": "string"
+            },
+            {
+              "id": "76c10edd-5811-4146-8ae1-10b1bc44287b",
+              "name": "Additional Info",
+              "value": "={{ $json['ADDITIONAL INFO'] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        16,
+        -16
+      ],
+      "id": "5a70d170-adff-41b0-919d-dd5d6d45ec8e",
+      "name": "Data Formatting"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=The Prospective Brand info:\n\nThe Name of The Brand to collab with: {{ $json.Name }}\n\nThe Email of the Brand to collabo with: {{ $json.Email }}\n\nThe Brand's Product/Service: {{ $json['Product/Service'] }}\n\nHas The product been used: {{ $json.ProductUsed }}\n\nIf yes, what did I like about the product: {{ $json['Product Strength'] }}\n\nIf yes, my audience reception to the product: \n{{ $json['Audience Reception'] }}\n\nAny Info that would make me stand out to the brand: {{ $json['Additional Info'] }}"
+            },
+            {
+              "role": "=system",
+              "content": "=#Overview\nYou are an email copywriter for a lifestyle content creator named NewLife. Your job is to write personalized, brand-specific outreach emails that are warm, professional, and authentic. The goal is to introduce the creator’s personal brand, highlight a genuine connection to the recipient’s brand or product, and propose a potential paid collaboration. Always sign off as THE NewLife BRAND  \n\n#Structure:\n-  **Greeting** – Address the brand or recipient warmly by name. \n- **Introduction** – Briefly introduce the creator (name + personal brand + unique qualities/values). \n- **Connection** – Mention how the creator has engaged with or admired the recipient’s brand/product, ideally with a personal story, usage example, or result. This is If they have ever interacted with the brand/product  \n- **Audience Fit** – Explain why the creator’s audience would love the recipient’s product or brand (include demographics, demand, or resonance).  \n- **Paid Collaboration Intent** – Clearly but politely suggest how the creator would like to collaborate (e.g., introducing a specific product to their audience).  \n- **Closing** – End with gratitude, warmth, and openness to future communication.  \n\nTone: Friendly, authentic, and slightly enthusiastic, professional and straight to the point.  \n\n### Instructions\n- Keep it concise (200 words).  \n- Make sure the email feels personal, not copy-pasted.  \n- Highlight both the creator’s brand values and why the recipient’s brand fits well with them. \n- Don't make use of the oxford comma or '-'\n- Don't include an email subject, just the body\n- Make use of only simple and easy to understand words.\n- Strictly make use of info given. Do not make up any information\n-The Email should be well formatted.\n\n#### Example\nMY name is Famakinwa Oluwatamilore and I own a\nunique personal brand- THE NEWLIFE BRAND,\n\nThe FAMTAM BRAND is a Brand that centers on\nAUTHENTICITY, CreAtivity, value and growth. it is\nan honour to virtually connect with your brand and I\nhope this meets you well.\n\nI have been a hard core fan of BEAUTYLINEBYDIDI's\nProducts since about three to four years ago. 1 introduced\nthe CLARO gloss to my audience through one of my videos\nand I got tons of compliments about the gloss.\n\nI would really love to introduce other glosses to my\naudience especially the BLACK COFFEE AND EXPRESSO\nglosses. Eighty percent of my audience are females and\nthe demand for the perfect brown lipgloss has been quite\nhigh. Most ladies find it hard to outline their lips and\noutlining with any of BEAUTYLINEBYDIDl's glosses or\nlipstains makes things easier. I'm certain they would love\nit.\n\nThank you so much for your time and i look forward to a\npositive response from the brand.\n\nCheers,\nNewLife."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        160,
+        -16
+      ],
+      "id": "09936037-6a75-4307-a0c0-c20af8b6c33c",
+      "name": "Email Generator",
+      "credentials": {
+        "openAiApi": {
+          "id": "TULjb22tiJq7GqfU",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "76496601-2f76-43d9-8d60-5a52cfb3c1b2",
+              "name": "Email",
+              "value": "={{ $json.output[0].content[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        512,
+        -16
+      ],
+      "id": "44ad23cb-d138-41e4-a368-5192232ad85c",
+      "name": "Email Setting"
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "sendTo": "tomiwaemmanuel49@gmail.com",
+        "subject": "is this good to go?",
+        "message": "={{ $json.Email }}",
+        "responseType": "freeText",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        768,
+        -16
+      ],
+      "id": "3aa760ea-28b9-4259-b2e9-61b05e097643",
+      "name": "Human Response",
+      "webhookId": "0696ebd3-31eb-4b7b-aa9e-4e64c4ba57d6",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "hk7reHniFpoCxDOU",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputText": "={{ $json.data.text }}",
+        "categories": {
+          "categories": [
+            {
+              "category": "Approved",
+              "description": "The email is approved and good to go"
+            },
+            {
+              "category": "Disapproved",
+              "description": "The gmail needs some correction "
+            }
+          ]
+        },
+        "options": {
+          "enableAutoFixing": true
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "typeVersion": 1.1,
+      "position": [
+        1008,
+        -16
+      ],
+      "id": "a022f809-3f89-405c-83cf-ea6cc2137f42",
+      "name": "Decision Point"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Data Formatting').item.json.Email }}",
+        "subject": "=Hello, {{ $('Data Formatting').item.json.Name }}",
+        "emailType": "text",
+        "message": "={{ $('Email Setting').item.json.Email }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1360,
+        -112
+      ],
+      "id": "ece4c8fa-77d8-4bf9-a939-9c493f1795b2",
+      "name": "Send Mail",
+      "webhookId": "ff57e56c-bd59-463b-af05-ff3eac1c1dbc",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "hk7reHniFpoCxDOU",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=Here is the email to revise: {{ $('Email Generator').item.json.output[0].content[0].text }}\n\nHere is the human feedback: {{ $('Human Response').item.json.data.text }}\n"
+            },
+            {
+              "role": "system",
+              "content": "=#Overview\nYou are an expert email copywriter. Your job is to take an incoming email and revise it based on the feedback the human submitted\n\n## Instructions\n- Tone: Friendly, authentic, and slightly enthusiastic, professional and straight to the point.  \n- Strictly make use of the info given, don't make up any information\n- Don't make use of the oxford comma or '-'"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        1408,
+        128
+      ],
+      "id": "20c4af6b-d2b3-4a98-a0b0-d61d46bdab03",
+      "name": "Revision Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "TULjb22tiJq7GqfU",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Decision Point",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Brand info": {
+      "main": [
+        [
+          {
+            "node": "Data Formatting",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Data Formatting": {
+      "main": [
+        [
+          {
+            "node": "Email Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Generator": {
+      "main": [
+        [
+          {
+            "node": "Email Setting",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Setting": {
+      "main": [
+        [
+          {
+            "node": "Human Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Human Response": {
+      "main": [
+        [
+          {
+            "node": "Decision Point",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Decision Point": {
+      "main": [
+        [
+          {
+            "node": "Send Mail",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Revision Model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Revision Model": {
+      "main": [
+        [
+          {
+            "node": "Email Setting",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "9fabb87f-942b-4812-8ef3-d553472c0192",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "649f635639e430d8373d3373906bbec0a4ec98cfc0f841ebdc86ea2aef5ba160"
+  },
+  "id": "M4YH6sY67E3Yeua8",
+  "tags": []
+}
